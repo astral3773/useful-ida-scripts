@@ -125,8 +125,8 @@ def remove_junk_from_current_function():
 
 class ArgFixer(idaapi.plugin_t):
     flags = idaapi.PLUGIN_UNL
-    comment = ""
-    help = ""
+    comment = "Removes basic stack obfuscation (tested on R6S)"
+    help = f"Edit->Plugin->FindFunc or {PLUGIN_HOTKEY}"
     wanted_name = PLUGIN_NAME
     wanted_hotkey = HOTKEY
 
