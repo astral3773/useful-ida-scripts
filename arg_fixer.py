@@ -6,10 +6,10 @@ import re
 import struct
 
 PLUGIN_NAME = "Arg Fixer"
-HOTKEY = "Ctrl+Shift+U"
+PLUGIN_HOTKEY = "Ctrl+Shift+U"
 
-JUNK_VAR_THRESHOLD = -0x10000
-JUNK_ARG_THRESHOLD = 0x10000    
+JUNK_VAR_THRESHOLD = -0x2000
+JUNK_ARG_THRESHOLD = 0x2000    
 
 def get_max_stack_offset(func):
     max_offset = 0
@@ -69,6 +69,9 @@ def remove_junk_from_current_function():
         print("[arg fixer] Failed to get function object")
         return
 
+    idaapi.set_frame_size(func, 0x5000, True, True)
+    idaapi.update_func(func)
+    
     max_offset = get_max_stack_offset(func)
     new_frame_size = (max_offset + 0x10 + 0xF) & ~0xF
     print(f"[arg fixer] Calculated new frame size: 0x{new_frame_size:X}")
@@ -114,27 +117,34 @@ def remove_junk_from_current_function():
     current_size = idaapi.get_frame_size(func)
     print(f"[arg fixer] Current stack frame size: 0x{current_size:X}")
 
-    if current_size > new_frame_size:
-        print(f"[arg fixer] Resizing frame to 0x{new_frame_size:X}")
-        idaapi.set_frame_size(func, new_frame_size, True, True)
-        idaapi.update_func(func)
-    else:
-        print("[arg fixer] Frame size is already smaller than calculated size")
-
+    idaapi.set_frame_size(func, 0x5000, True, True)
+    idaapi.update_func(func)
     remove_junk_vars_from_frame(func)
+    
+    if new_frame_size >= current_size and current_size > 0x5000:
+        new_frame_size = 0x5000
+
+    print(f"[arg fixer] Resizing frame to 0x{new_frame_size:X}")
+    idaapi.set_frame_size(func, 0x5000, True, True)
+    idaapi.update_func(func)
+
+ 
 
 class ArgFixer(idaapi.plugin_t):
     flags = idaapi.PLUGIN_UNL
     comment = "Removes basic stack obfuscation (tested on R6S)"
     help = f"Edit->Plugin->FindFunc or {PLUGIN_HOTKEY}"
     wanted_name = PLUGIN_NAME
-    wanted_hotkey = HOTKEY
+    wanted_hotkey = PLUGIN_HOTKEY
 
     def init(self):
         print("[arg fixer] initialized.")
         return idaapi.PLUGIN_OK
 
     def run(self, arg):
+        remove_junk_from_current_function()
+        remove_junk_from_current_function()
+        remove_junk_from_current_function()
         remove_junk_from_current_function()
 
     def term(self):
