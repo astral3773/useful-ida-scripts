@@ -1,8 +1,8 @@
 # Useful Ida Scripts
 
 
-### Arg Fixer
+### Arg Fixer (Ctrl+Shift+U)
 > Removes basic stack obfuscation (created for Rainbow Six Siege obfuscation/encryption.)
 
-### Constant Finder
+### Constant Finder (Ctrl+Shift+K)
 > Searches current function for rdata constant xrefs. Very useful for finding ways to consistently find functions across updates/builds.
